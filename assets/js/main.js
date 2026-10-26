@@ -152,6 +152,17 @@
 
 var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/way-03.jpg', 'assets/img/way-04.jpg', 'assets/img/way-05.jpg', 'assets/img/way-06.jpg', 'assets/img/way-07.jpg', 'assets/img/way-08.jpg', 'assets/img/way-09.jpg', 'assets/img/way-10.jpg'];
 
+  /* ---------- 预加载：进入页面即加载全部图片素材，避免滚动到节点时才拉图 ---------- */
+  (function preloadImages() {
+    var urls = WAY_IMGS.slice();
+    var imgs = document.querySelectorAll('img[src^="assets/img/"]');
+    for (var i = 0; i < imgs.length; i++) {
+      var s = imgs[i].getAttribute('src');
+      if (s && urls.indexOf(s) === -1) urls.push(s);
+    }
+    for (var j = 0; j < urls.length; j++) { var pre = new Image(); pre.src = urls[j]; }
+  })();
+
   var WAY = [
     { lon: 115.41, lat: 25.95, date: '1934.10', title: '于都河畔 · 长征出发',
       desc: '中央红军主力 8.6 万余人夜渡于都河，踏上战略转移之路。',

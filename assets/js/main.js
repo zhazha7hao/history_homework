@@ -206,6 +206,22 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
       key: true, label: '会宁', side: 'left', dy: 5, link: GB }
   ];
 
+  /* 每个路线节点的累计行军数据（中央红军口径）。
+     河/山/战斗按重大事件累计；累计里程为按行程进度的示意值——
+     实际路线迂回曲折、各段里程统计口径不一，仅用于直观呈现。 */
+  var ROUTE_DATA = [
+    { mile:0,     river:1,  mtn:0,  snow:0, battle:0,   troop:86000 }, // 0 于都 · 出发
+    { mile:2000,  river:5,  mtn:2,  snow:0, battle:40,  troop:30000 }, // 1 湘江
+    { mile:4500,  river:7,  mtn:5,  snow:0, battle:60,  troop:30000 }, // 2 遵义
+    { mile:8000,  river:11, mtn:7,  snow:0, battle:130, troop:28000 }, // 3 四渡赤水
+    { mile:12000, river:14, mtn:9,  snow:0, battle:170, troop:20000 }, // 4 金沙江
+    { mile:15000, river:17, mtn:11, snow:0, battle:210, troop:20000 }, // 5 大渡河·泸定桥
+    { mile:17500, river:19, mtn:13, snow:1, battle:230, troop:20000 }, // 6 夹金山·雪山
+    { mile:21000, river:22, mtn:18, snow:5, battle:250, troop:14000 }, // 7 草地
+    { mile:25000, river:24, mtn:18, snow:5, battle:380, troop:7000  }, // 8 吴起镇
+    { mile:25000, river:24, mtn:18, snow:5, battle:380, troop:7000  }  // 9 会宁会师
+  ];
+
   /* 仅作相对定位使用：真实经纬度 → 画布坐标 */
   var NS = 'http://www.w3.org/2000/svg';
   var VBX = 252, VBY = 146, VBW = 218, VBH = 190;
@@ -249,6 +265,19 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
   var rsNow = document.getElementById('rsNow');
   var routeMain, routeJoin, markers = [], ticks = [];
   var lens = { main: 0, join: 0 };
+
+  /* 行军数据面板元素 */
+  var rdMile = document.getElementById('rdMile'),
+      rdRiver = document.getElementById('rdRiver'),
+      rdMtn = document.getElementById('rdMtn'),
+      rdSnow = document.getElementById('rdSnow'),
+      rdBattle = document.getElementById('rdBattle'),
+      rdMileBar = document.getElementById('rdMileBar'),
+      rdDate = document.getElementById('rdDate'),
+      rdTroop = document.getElementById('rdTroop'),
+      rdTroopM = document.getElementById('rdTroopM'),
+      troopSvg = document.getElementById('troopSvg');
+  var troopCurDot = null, troopClipRect = null, tweenRaf = {};
 
   function buildRoute() {
     if (!mapSvg) return;
@@ -325,6 +354,102 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     });
 
     setActive(0);
+  }
+
+  /* ---------- 行军数据面板：数字平滑 + 兵力变化图 ---------- */
+  function fmtTroop(v) {
+    if (v >= 10000) return (v / 10000) + '万';
+    return v + '';
+  }
+  function tweenNum(el, to, fmt) {
+    if (!el) return;
+    var from = parseFloat(el.getAttribute('data-cur')) || 0;
+    el.setAttribute('data-cur', to);
+    if (reduce) { el.textContent = fmt ? fmt(to) : to; return; }
+    var t0 = performance.now(), dur = 750;
+    if (tweenRaf[el.id]) cancelAnimationFrame(tweenRaf[el.id]);
+    (function step(t) {
+      var p = Math.min(1, (t - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 3);
+      var v = Math.round(from + (to - from) * e);
+      el.textContent = fmt ? fmt(v) : v;
+      if (p < 1) tweenRaf[el.id] = requestAnimationFrame(step);
+    })(t0);
+  }
+
+  /* 兵力变化：中央红军 8.6万 → 约7000 */
+  var TROOP = [86000, 30000, 30000, 28000, 20000, 20000, 20000, 14000, 7000];
+  var TW = 320, TH = 132, TPL = 18, TPR = 18, TPT = 20, TPB = 24;
+  function tX(i) { return TPL + i * (TW - TPL - TPR) / (TROOP.length - 1); }
+  function tY(v) { return TPT + (1 - v / 86000) * (TH - TPT - TPB); }
+
+  function buildTroop() {
+    if (!troopSvg) return;
+    var lineD = 'M' + tX(0) + ' ' + tY(TROOP[0]);
+    for (var i = 1; i < TROOP.length; i++) lineD += 'L' + tX(i) + ' ' + tY(TROOP[i]);
+    var areaD = lineD + 'L' + tX(8) + ' ' + (TH - TPB) + 'L' + tX(0) + ' ' + (TH - TPB) + 'Z';
+
+    var defs = svgEl('defs', {});
+    var grad = svgEl('linearGradient', { id: 'troopGrad', x1: 0, y1: 0, x2: 0, y2: 1 });
+    grad.appendChild(svgEl('stop', { offset: '0%', 'stop-color': '#B4241B', 'stop-opacity': .55 }));
+    grad.appendChild(svgEl('stop', { offset: '100%', 'stop-color': '#B4241B', 'stop-opacity': .04 }));
+    defs.appendChild(grad);
+    var clip = svgEl('clipPath', { id: 'troopClip' });
+    troopClipRect = svgEl('rect', { x: 0, y: 0, width: 0, height: TH });
+    clip.appendChild(troopClipRect);
+    defs.appendChild(clip);
+    troopSvg.appendChild(defs);
+
+    /* 淡底：完整趋势，初始即可读 */
+    troopSvg.appendChild(svgEl('path', { d: areaD, fill: 'rgba(180,36,27,.10)' }));
+    troopSvg.appendChild(svgEl('path', { d: lineD, fill: 'none', stroke: 'rgba(199,154,59,.35)', 'stroke-width': 1.4 }));
+    /* 高亮：随行程展开 */
+    troopSvg.appendChild(svgEl('path', { d: areaD, fill: 'url(#troopGrad)', 'clip-path': 'url(#troopClip)' }));
+    troopSvg.appendChild(svgEl('path', { d: lineD, fill: 'none', stroke: '#E2542C', 'stroke-width': 2, 'stroke-linejoin': 'round', 'clip-path': 'url(#troopClip)' }));
+    troopSvg.appendChild(svgEl('line', { x1: TPL, y1: TH - TPB, x2: TW - TPR, y2: TH - TPB, stroke: 'rgba(199,154,59,.3)', 'stroke-width': 1 }));
+
+    /* 关键兵力标注 */
+    [{ i: 0, t: '8.6万', a: 'start', dy: -7 }, { i: 1, t: '3万', a: 'middle', dy: -7 }, { i: 8, t: '7000', a: 'end', dy: -8 }].forEach(function (m) {
+      var lab = svgEl('text', { x: tX(m.i), y: tY(TROOP[m.i]) + m.dy, 'text-anchor': m.a, 'font-size': 9.5, fill: '#F3EADA' });
+      lab.textContent = m.t;
+      troopSvg.appendChild(lab);
+    });
+    /* 时间轴标签 */
+    [{ i: 0, t: '1934.10', a: 'start' }, { i: 8, t: '1935.10', a: 'end' }].forEach(function (m) {
+      var lab = svgEl('text', { x: tX(m.i), y: TH - 8, 'text-anchor': m.a, 'font-size': 8.5, fill: 'rgba(243,234,218,.5)' });
+      lab.textContent = m.t;
+      troopSvg.appendChild(lab);
+    });
+
+    troopCurDot = svgEl('circle', { r: 4, fill: '#F3EADA', stroke: '#E2542C', 'stroke-width': 1.6 });
+    troopSvg.appendChild(troopCurDot);
+  }
+
+  function updateTroop(i) {
+    if (!troopSvg || !troopCurDot) return;
+    var k = Math.min(i, TROOP.length - 1);
+    var cw = k === 0 ? tX(0) + 6 : tX(k) + 6;
+    if (k === TROOP.length - 1) cw = TW;
+    if (troopClipRect) troopClipRect.setAttribute('width', cw);
+    troopCurDot.setAttribute('cx', tX(k));
+    troopCurDot.setAttribute('cy', tY(TROOP[k]));
+  }
+
+  function updatePanel(i) {
+    var d = ROUTE_DATA[Math.min(i, ROUTE_DATA.length - 1)];
+    var w = WAY[i];
+    if (!d) return;
+    tweenNum(rdMile, d.mile, function (v) { return v.toLocaleString('en-US'); });
+    tweenNum(rdRiver, d.river, null);
+    tweenNum(rdMtn, d.mtn, null);
+    tweenNum(rdSnow, d.snow, null);
+    tweenNum(rdBattle, d.battle, null);
+    if (rdMileBar) rdMileBar.style.width = (d.mile / 25000 * 100) + '%';
+    if (rdDate && w) rdDate.textContent = w.date + ' · ' + w.label;
+    var join = i === 9;
+    if (rdTroop) rdTroop.textContent = join ? '会师' : fmtTroop(d.troop);
+    if (rdTroopM) rdTroopM.textContent = join ? '会师' : fmtTroop(d.troop);
+    updateTroop(i);
   }
 
   /* 地名标签自动避让：重叠时上下推开，必要时加引线连回点位 */
@@ -416,6 +541,7 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     callout.classList.add('show');
     if (rsNow) rsNow.textContent = w.date + ' · ' + w.label;
     positionCallout(i);
+    updatePanel(i);
   }
 
   /* 点击点位 / 刻度：时间线平滑跳转至该节点 */
@@ -506,6 +632,7 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
 
   if (mapSvg) {
     try {
+      buildTroop();
       buildRoute();
       updateRoute();
     } catch (err) { /* 路线图异常不影响全站 */ }

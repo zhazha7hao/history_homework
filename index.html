@@ -140,6 +140,7 @@
 
   <div class="route-scroll" id="routeScroll">
     <div class="route-sticky">
+     <div class="route-mid">
       <div class="route-canvas" id="routeCanvas">
         <svg id="mapSvg" viewBox="252 146 218 190" preserveAspectRatio="xMidYMid meet" role="img" aria-label="按真实经纬度排布的长征路线图"></svg>
 
@@ -155,6 +156,58 @@
           <div class="rc-links" id="rcLinks"></div>
         </div>
       </div>
+
+      <aside class="route-data" id="routeData" aria-label="长征行军数据">
+        <div class="rd-head">
+          <span class="rd-title">行军数据</span>
+          <span class="rd-date" id="rdDate">1934.10 · 于都</span>
+        </div>
+
+        <div class="rd-cards">
+          <div class="rd-item">
+            <div class="rd-num"><span id="rdMile">0</span><small>里</small></div>
+            <div class="rd-label">累计里程</div>
+            <div class="rd-bar"><i id="rdMileBar"></i></div>
+          </div>
+          <div class="rd-item">
+            <div class="rd-num"><span id="rdRiver">1</span><small>条</small></div>
+            <div class="rd-label">跨越江河</div>
+          </div>
+          <div class="rd-item">
+            <div class="rd-num"><span id="rdMtn">0</span><small>座</small></div>
+            <div class="rd-label">翻越大山</div>
+            <div class="rd-sub2">含雪山 <b id="rdSnow">0</b> 座</div>
+          </div>
+          <div class="rd-item">
+            <div class="rd-num"><span id="rdBattle">0</span><small>次</small></div>
+            <div class="rd-label">大小战斗</div>
+          </div>
+          <div class="rd-item rd-troop-card">
+            <div class="rd-num"><span id="rdTroopM">8.6万</span></div>
+            <div class="rd-label">现有兵力</div>
+          </div>
+        </div>
+
+        <div class="rd-detail">
+          <div class="rd-troop">
+            <div class="rd-troop-head">
+              <span class="rd-sub">兵力变化 · 中央红军</span>
+              <span class="rd-troop-now">现存 <b id="rdTroop">8.6万</b></span>
+            </div>
+            <svg id="troopSvg" viewBox="0 0 320 132" role="img" aria-label="中央红军兵力从8.6万余人减至约7000人的折线图"></svg>
+            <p class="rd-troop-note">出发时 8.6 万余人，到达陕北仅约 7000 人——平均每行进一公里，就有三四名战士永远倒下。</p>
+          </div>
+
+          <div class="rd-age">
+            <span class="rd-sub">这支队伍有多年轻</span>
+            <div class="rd-age-row">
+              <div class="rd-age-big">≈20<small>岁</small></div>
+              <p>战斗员平均年龄约 <b>20 岁</b>，师团级指挥员不足 <b>25 岁</b>；14—18 岁的小战士约占四成，少共国际师平均仅 18 岁。</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+     </div><!-- /route-mid -->
 
       <div class="route-scale">
         <div class="rs-top">
@@ -196,6 +249,23 @@
           <figure class="spot-img"><img src="assets/img/military-museum.jpg" alt="中国人民革命军事博物馆" data-lb data-lb-cap="中国人民革命军事博物馆 · 北京"><figcaption>场馆实景 · 北京</figcaption></figure>
           <h4>中国人民革命军事博物馆</h4>
           <p>馆藏大量红军长征文物、武器与文献，常设与专题展览系统呈现长征历史脉络。</p>
+          <div class="relics">
+            <p class="relics-title">经典展物</p>
+            <div class="relic-grid">
+              <figure class="relic">
+                <img src="assets/img/artifact-jb-1.jpg" alt="半截皮带" loading="lazy" data-lb data-lb-cap="半截皮带 · 中国人民革命军事博物馆">
+                <figcaption><strong>半截皮带</strong><span>过草地时断粮，战士把皮带切成小段煮食充饥，仍舍不得吃完，在背面刻下“长征记”，见证“革命理想高于天”。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-jb-2.jpg" alt="泸定桥铁索" loading="lazy" data-lb data-lb-cap="泸定桥铁索 · 中国人民革命军事博物馆">
+                <figcaption><strong>泸定桥铁索</strong><span>泸定桥由 13 根铁索组成，22 名勇士攀着被抽去木板的光秃铁索，冒着枪林弹雨冲过对岸，此为桥上的一段铁索。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-jb-3.jpg" alt="手摇发电机与发报机" loading="lazy" data-lb data-lb-cap="手摇发电机与发报机 · 中国人民革命军事博物馆">
+                <figcaption><strong>手摇发电机与发报机</strong><span>长征中，红军靠手摇发电机供电的电台收发报，保持各军团联络、协调部署，是突围转移的“千里眼、顺风耳”。</span></figcaption>
+              </figure>
+            </div>
+          </div>
           <div class="tagline">文物寻访 · 史料研读</div>
           <div class="spot-links">
             <a class="spot-link" href="http://www.jb.mil.cn" target="_blank" rel="noopener noreferrer">官网 · 数字展厅 <i>↗</i></a>
@@ -210,6 +280,23 @@
           <figure class="spot-img"><img src="assets/img/national-museum.jpg" alt="中国国家博物馆" data-lb data-lb-cap="中国国家博物馆 · 北京天安门广场东侧"><figcaption>场馆实景 · 北京</figcaption></figure>
           <h4>中国国家博物馆</h4>
           <p>“复兴之路”等基本陈列中设有长征相关内容，适合做宏观历史脉络的梳理与拍摄记录。</p>
+          <div class="relics">
+            <p class="relics-title">经典展物</p>
+            <div class="relic-grid">
+              <figure class="relic">
+                <img src="assets/img/artifact-gb-1.jpg" alt="李大钊就义绞刑架" loading="lazy" data-lb data-lb-cap="李大钊就义绞刑架 · 0001 号文物">
+                <figcaption><strong>李大钊就义绞刑架</strong><span>新中国文物部门接管的第一件革命文物，编号“0001”。1927 年李大钊等志士就义于此，锈迹斑斑的底座上隐约可见血迹。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-gb-2.jpg" alt="开国大典第一面五星红旗" loading="lazy" data-lb data-lb-cap="开国大典第一面五星红旗 · 中国国家博物馆">
+                <figcaption><strong>开国大典第一面五星红旗</strong><span>1949 年 10 月 1 日开国大典上，毛泽东在天安门城楼上按动电钮，亲手升起这面五星红旗。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-gb-3.jpg" alt="《共产党宣言》首译本" loading="lazy" data-lb data-lb-cap="《共产党宣言》第一个中文全译本 · 中国国家博物馆">
+                <figcaption><strong>《共产党宣言》首译本</strong><span>1920 年 8 月在上海出版，是陈望道翻译的第一个中文全译本，留下“真理的味道非常甜”的佳话。</span></figcaption>
+              </figure>
+            </div>
+          </div>
           <div class="tagline">通史视角 · 展陈记录</div>
           <div class="spot-links">
             <a class="spot-link" href="https://www.chnmuseum.cn" target="_blank" rel="noopener noreferrer">官网首页 <i>↗</i></a>
@@ -225,6 +312,23 @@
           <figure class="spot-img"><img src="assets/img/xiangshan-memorial.jpg" alt="香山革命纪念馆" data-lb data-lb-cap="香山革命纪念馆 · 北京香山脚下"><figcaption>场馆实景 · 北京</figcaption></figure>
           <h4>香山革命纪念馆</h4>
           <p>聚焦“进京赶考”的历史时刻，可与长征终点的陕北岁月形成“未完待续”的叙事衔接。</p>
+          <div class="relics">
+            <p class="relics-title">经典展物</p>
+            <div class="relic-grid">
+              <figure class="relic">
+                <img src="assets/img/artifact-xs-1.jpg" alt="开国大典大红灯笼" loading="lazy" data-lb data-lb-cap="开国大典大红灯笼 · 香山革命纪念馆镇馆之宝">
+                <figcaption><strong>开国大典大红灯笼</strong><span>开国大典时悬挂在天安门城楼上的大红灯笼，高约 3.32 米、周长 8.05 米、重约 80 公斤，是该馆的“镇馆之宝”。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-xs-2.jpg" alt="渡江战役木船" loading="lazy" data-lb data-lb-cap="渡江战役木船 · 香山革命纪念馆">
+                <figcaption><strong>渡江战役木船</strong><span>1949 年渡江战役中，沿江群众划着这样的小木船把百万雄师送过长江，被称为“小船划出来的胜利”。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-xs-3.jpg" alt="“渡江第一船”锦旗" loading="lazy" data-lb data-lb-cap="“渡江第一船”锦旗 · 香山革命纪念馆">
+                <figcaption><strong>“渡江第一船”锦旗</strong><span>奖给渡江作战中的“水上英雄”，锦旗一角被炮弹击穿，船工们用生命捍卫了这份荣誉。</span></figcaption>
+              </figure>
+            </div>
+          </div>
           <div class="tagline">转折叙事 · 对比研究</div>
           <div class="spot-links">
             <a class="spot-link" href="https://www.xiangshan1949.cn" target="_blank" rel="noopener noreferrer">官网 · 虚拟展馆 <i>↗</i></a>
@@ -239,6 +343,23 @@
           <figure class="spot-img"><img src="assets/img/war-memorial.jpg" alt="中国人民抗日战争纪念馆" data-lb data-lb-cap="中国人民抗日战争纪念馆 · 北京宛平城"><figcaption>场馆实景 · 北京</figcaption></figure>
           <h4>中国人民抗日战争纪念馆</h4>
           <p>位于宛平城、卢沟桥畔，可结合红军改编为八路军的历史节点，理解长征之后的民族救亡。</p>
+          <div class="relics">
+            <p class="relics-title">经典展物</p>
+            <div class="relic-grid">
+              <figure class="relic">
+                <img src="assets/img/artifact-kz-1.jpg" alt="第 29 军大刀" loading="lazy" data-lb data-lb-cap="第 29 军大刀 · 中国人民抗日战争纪念馆">
+                <figcaption><strong>第 29 军大刀</strong><span>1937 年七七事变中，第 29 军将士在卢沟桥、宛平城抡起大刀与日军肉搏，《大刀进行曲》由此唱响。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-kz-2.jpg" alt="第 29 军钢盔" loading="lazy" data-lb data-lb-cap="第 29 军钢盔 · 国家一级文物">
+                <figcaption><strong>第 29 军钢盔</strong><span>1985 年在宛平城内出土，为国家一级文物。出土时盔内还留有 17 枚子弹，盔身弹孔清晰，记录着战斗的惨烈。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-kz-3.jpg" alt="赵一曼遗书" loading="lazy" data-lb data-lb-cap="赵一曼遗书 · 中国人民抗日战争纪念馆">
+                <figcaption><strong>赵一曼遗书</strong><span>赵一曼牺牲前给儿子写下遗书：“母亲不用千言万语来教育你，就用实行来教育你。”纸短情长，尽显家国大义。</span></figcaption>
+              </figure>
+            </div>
+          </div>
           <div class="tagline">历史衔接 · 实地调研</div>
           <div class="spot-links">
             <a class="spot-link" href="https://www.1937china.com" target="_blank" rel="noopener noreferrer">官网首页 <i>↗</i></a>
@@ -254,6 +375,23 @@
           <figure class="spot-img"><img src="assets/img/beida-red-building.jpg" alt="北大红楼 · 中国共产党早期北京革命活动纪念馆" data-lb data-lb-cap="北大红楼 · 北京五四大街"><figcaption>场馆实景 · 北京</figcaption></figure>
           <h4>北大红楼 · 中国共产党早期北京革命活动纪念馆</h4>
           <p>从思想启蒙到革命实践，理解长征背后理想信念的源头与青年的选择。</p>
+          <div class="relics">
+            <p class="relics-title">经典展物</p>
+            <div class="relic-grid">
+              <figure class="relic">
+                <img src="assets/img/artifact-hl-1.jpg" alt="《我的马克思主义观》" loading="lazy" data-lb data-lb-cap="《我的马克思主义观》 · 李大钊，载于《新青年》">
+                <figcaption><strong>《我的马克思主义观》</strong><span>1919 年李大钊在《新青年》上发表此文，系统介绍马克思主义，成为当时进步青年的启蒙读物。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-hl-2.jpg" alt="李大钊图书馆主任室" loading="lazy" data-lb data-lb-cap="李大钊图书馆主任室（复原） · 北大红楼">
+                <figcaption><strong>李大钊图书馆主任室</strong><span>按原貌复原。1920 年 10 月，北京的共产党早期组织在这里成立，红楼由此成为马克思主义传播的中心。</span></figcaption>
+              </figure>
+              <figure class="relic">
+                <img src="assets/img/artifact-hl-3.jpg" alt="第二阅览室" loading="lazy" data-lb data-lb-cap="第二阅览室（新闻纸阅览室，复原） · 毛泽东曾在此工作">
+                <figcaption><strong>毛泽东工作过的第二阅览室</strong><span>又称新闻纸阅览室，按原貌复原。1918 年 10 月至 1919 年 3 月，毛泽东在此担任书记员，负责登记新到报刊。</span></figcaption>
+              </figure>
+            </div>
+          </div>
           <div class="tagline">青年视角 · 理想信念</div>
           <div class="spot-links">
             <a class="spot-link" href="https://www.beijing.gov.cn/renwen/rwzyd/qxdw/jxndqcqx/bdhl/202309/t20230918_3261540.html" target="_blank" rel="noopener noreferrer">场馆介绍 <i>↗</i></a>

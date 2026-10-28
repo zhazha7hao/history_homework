@@ -300,6 +300,50 @@ body::before{
   color:rgba(199,154,59,.62);line-height:1.95;max-width:58em;
 }
 
+/* ---------- 长征路线 · 行军数据面板 ---------- */
+.route-mid{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(8px,1.4vw,16px);}
+.route-data{
+  flex:0 0 auto;display:flex;flex-direction:column;gap:clamp(10px,1.5vw,16px);
+  padding:clamp(10px,1.4vw,16px);color:var(--paper);
+  background:linear-gradient(180deg,rgba(27,18,11,.97),rgba(19,12,7,.97));
+  border:1px solid rgba(199,154,59,.3);border-top:3px solid var(--vermilion);
+}
+.rd-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.rd-title{font-family:var(--display);font-size:clamp(14px,1.9vw,18px);letter-spacing:.18em;color:#F6EBD8;}
+.rd-date{font-family:var(--display);font-size:clamp(9px,1.6vw,10.5px);letter-spacing:.12em;color:var(--gold);white-space:nowrap;}
+.rd-cards{display:flex;gap:7px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(199,154,59,.5) transparent;}
+.rd-cards::-webkit-scrollbar{height:4px;}
+.rd-cards::-webkit-scrollbar-thumb{background:rgba(199,154,59,.45);}
+.rd-item{flex:0 0 auto;min-width:70px;padding:8px 10px;background:rgba(199,154,59,.08);border:1px solid rgba(199,154,59,.22);}
+.rd-num{font-family:var(--display);font-size:clamp(17px,2.5vw,27px);line-height:1;color:#F6EBD8;}
+.rd-num small{font-size:.4em;color:var(--gold);margin-left:.25em;letter-spacing:.08em;}
+.rd-label{margin-top:5px;font-size:clamp(8.5px,1.5vw,9.5px);letter-spacing:.14em;color:rgba(243,234,218,.6);white-space:nowrap;}
+.rd-sub2{margin-top:3px;font-size:clamp(8px,1.4vw,9px);letter-spacing:.06em;color:rgba(243,234,218,.5);white-space:nowrap;}
+.rd-sub2 b{color:var(--vermilion);font-weight:400;}
+.rd-bar{margin-top:6px;height:3px;background:rgba(199,154,59,.16);}
+.rd-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold));}
+.rd-detail{display:none;flex-direction:column;gap:16px;}
+.rd-sub{font-family:var(--display);font-size:12px;letter-spacing:.2em;color:#F6EBD8;}
+.rd-troop-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:5px;}
+.rd-troop-now{font-family:var(--display);font-size:10px;letter-spacing:.1em;color:rgba(243,234,218,.6);white-space:nowrap;}
+.rd-troop-now b{color:var(--vermilion);font-weight:400;font-size:15px;margin-left:.2em;}
+#troopSvg{width:100%;height:auto;display:block;}
+.rd-troop-note{margin-top:6px;font-size:10px;line-height:1.7;color:rgba(243,234,218,.55);}
+.rd-age{padding-top:14px;border-top:1px solid rgba(199,154,59,.2);}
+.rd-age-row{display:flex;gap:14px;align-items:center;margin-top:9px;}
+.rd-age-big{font-family:var(--display);font-size:clamp(32px,4.6vw,44px);line-height:1;color:var(--gold);flex:none;}
+.rd-age-big small{font-size:.32em;color:rgba(243,234,218,.6);margin-left:.1em;}
+.rd-age-row p{font-size:11px;line-height:1.8;color:rgba(243,234,218,.62);}
+.rd-age-row p b{color:#F6EBD8;font-weight:600;}
+@media (min-width:960px){
+  .route-mid{flex-direction:row;}
+  .route-data{flex:0 0 clamp(300px,27vw,352px);overflow-y:auto;}
+  .rd-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;overflow:visible;}
+  .rd-item{min-width:0;padding:12px 13px;}
+  .rd-troop-card{display:none;}
+  .rd-detail{display:flex;}
+}
+
 /* ================= 京华红迹 ================= */
 .spots{margin-top:clamp(44px,8vw,72px);display:grid;gap:clamp(14px,2.8vw,20px);}
 @media (min-width:760px){.spots{grid-template-columns:1fr 1fr;}}
@@ -330,6 +374,48 @@ body::before{
 .spot-link:hover{background:var(--red);color:#fff;transform:translateY(-2px);letter-spacing:.22em;}
 .spot-link i{font-style:normal;font-size:10px;opacity:.85;}
 .spot-note{margin-top:10px;font-size:11px;line-height:1.8;color:rgba(91,74,60,.72);}
+
+/* ===== 经典展物 ===== */
+.relics{
+  margin-top:15px;padding:14px 14px 13px;
+  background:linear-gradient(180deg,rgba(180,36,27,.055),rgba(199,154,59,.07));
+  border:1px solid rgba(180,36,27,.16);border-top:2px solid var(--red);
+}
+.relics .relics-title{
+  margin:0 0 12px;display:flex;align-items:center;gap:9px;
+  font-family:var(--display);font-size:12px;letter-spacing:.26em;color:var(--red);
+}
+.relics .relics-title::before{
+  content:"";width:12px;height:12px;flex:none;background:var(--red);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+}
+.relics .relics-title::after{
+  content:"";flex:1;height:1px;
+  background:linear-gradient(90deg,rgba(180,36,27,.4),transparent);
+}
+.relics .relic-grid{display:grid;gap:11px;}
+.relics .relic{
+  margin:0;display:grid;grid-template-columns:92px 1fr;gap:11px;align-items:start;
+  padding-bottom:11px;border-bottom:1px dashed rgba(33,25,18,.14);
+}
+.relics .relic:last-child{padding-bottom:0;border-bottom:none;}
+.relics .relic img{
+  width:92px;height:92px;display:block;object-fit:cover;cursor:zoom-in;
+  border:1px solid rgba(33,25,18,.2);
+  transition:box-shadow .3s ease,transform .3s ease;
+}
+.relics .relic img:hover{box-shadow:0 4px 14px rgba(180,36,27,.25);transform:translateY(-2px);}
+.relics .relic figcaption{font-size:11.5px;line-height:1.72;color:var(--ink-soft);}
+.relics .relic figcaption strong{
+  display:block;margin-bottom:2px;font-family:var(--display);font-weight:400;
+  font-size:13.5px;letter-spacing:.05em;color:var(--ink);
+}
+@media (max-width:440px){
+  .relics{padding:12px 11px 12px;}
+  .relics .relic{grid-template-columns:74px 1fr;gap:9px;}
+  .relics .relic img{width:74px;height:74px;}
+  .relics .relic figcaption{font-size:11px;line-height:1.65;}
+}
 
 /* ================= 跨时空对话 ================= */
 .echo-tabs{margin-top:clamp(38px,7vw,58px);display:flex;flex-wrap:wrap;gap:10px;}

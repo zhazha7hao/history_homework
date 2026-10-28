@@ -222,6 +222,27 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     { mile:25000, river:24, mtn:18, snow:5, battle:380, troop:7000  }  // 9 会宁会师
   ];
 
+  /* 长征典型故事：按路线进度（at, 0—1）插入路线之中，到达即自动展开。
+     部分故事（军需处长、金色的鱼钩等）为根据真实事迹创作的经典革命文学。 */
+  var STORIES = [
+    { at:0.07, span:0.05, title:'半条被子 · 军民情深',
+      body:'1934 年 11 月，3 名女红军在湖南汝城借宿徐解秀家，见她连御寒的被子都没有，临走时把仅有的一床被子剪下半条留下。徐解秀后来说：“什么是共产党？共产党就是自己有一条被子，也要剪下半条给老百姓的人。”' },
+    { at:0.13, span:0.05, title:'陈树湘 · 断肠铭志',
+      body:'湘江战役中，红 34 师师长陈树湘率部担任总后卫，血战到弹尽粮绝、腹部负伤被俘。被押解途中，他毅然从伤口绞断肠子，壮烈牺牲，年仅 29 岁，用生命践行了“为苏维埃新中国流尽最后一滴血”的誓言。' },
+    { at:0.22, span:0.05, title:'“红军菩萨”龙思泉',
+      body:'红军卫生员龙思泉在遵义桑木垭日夜为乡亲治病送药。部队转移时，他因救治病人未能跟上，被敌人杀害，年仅 19 岁。乡亲们含泪安葬他、立起“红军坟”，长年祭拜，把他当作救苦救难的“红军菩萨”。' },
+    { at:0.40, span:0.05, title:'一袋干粮 · 谁也不舍下谁',
+      body:'13 岁的小红军小兰扶伤员过桥时，自己的干粮袋掉进河里冲走。她瞒着大家，只煮些野草充饥；被发现后，战友们纷纷把自己的干粮分进她的袋子。长征路上，再难，也没有一个人被丢下。' },
+    { at:0.56, span:0.05, title:'一昼夜奔袭 240 里',
+      body:'为抢在敌人援兵前夺下泸定桥，红四团沿崎岖山路一昼夜奔袭 240 里，饥饿疲惫时就嚼辣椒提神，冒雨摸黑疾行，终于在次日清晨赶到桥头，为 22 名勇士飞夺铁索赢得了关键时间。' },
+    { at:0.63, span:0.05, title:'军需处长 · 一座丰碑',
+      body:'翻越雪山时，部队发现一位老战士冻僵在路旁，身上只穿着单薄破旧的衣服。将军怒吼：“为什么不给他发棉衣？把军需处长叫来！”——而这位冻僵的老人，正是把棉衣都让给战友的军需处长。（根据真实事迹）' },
+    { at:0.72, span:0.055, title:'金色的鱼钩',
+      body:'过草地时，一位炊事班长用缝衣针弯成鱼钩，钓来小鱼熬汤给三名生病的小战士补身体，自己却偷偷嚼草根、咽鱼骨。走出草地前夕他牺牲了，那枚鱼钩被珍藏下来——在战士们心中，它闪烁着灿烂的金色光芒。' },
+    { at:0.85, span:0.05, title:'一张报纸 · 定了去向',
+      body:'1935 年 9 月到达哈达铺，侦察连从缴获的报纸上看到陕北有刘志丹红军和根据地的消息。毛泽东据此在干部会上明确：“到陕北去，那里有刘志丹的红军！”长征的最终落脚点，就此确定。' }
+  ];
+
   /* 仅作相对定位使用：真实经纬度 → 画布坐标 */
   var NS = 'http://www.w3.org/2000/svg';
   var VBX = 252, VBY = 146, VBW = 218, VBH = 190;
@@ -248,6 +269,20 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     return d;
   }
 
+  /* 五角星路径：故事标记，区别于事件点位的圆点 */
+  function starPath(cx, cy, R) {
+    var r = R * 0.45, d = '';
+    for (var i = 0; i < 5; i++) {
+      var a1 = (-90 + i * 72) * Math.PI / 180;
+      var a2 = (-90 + i * 72 + 36) * Math.PI / 180;
+      var x1 = cx + R * Math.cos(a1), y1 = cy + R * Math.sin(a1);
+      var x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+      d += (i === 0 ? 'M' : 'L') + x1.toFixed(1) + ' ' + y1.toFixed(1) +
+           'L' + x2.toFixed(1) + ' ' + y2.toFixed(1);
+    }
+    return d + 'Z';
+  }
+
   var mapSvg = document.getElementById('mapSvg');
   var canvas = document.getElementById('routeCanvas');
   var routeScroll = document.getElementById('routeScroll');
@@ -263,8 +298,15 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
   var rsDot = document.getElementById('rsDot');
   var rsTrack = document.getElementById('rsTrack');
   var rsNow = document.getElementById('rsNow');
-  var routeMain, routeJoin, markers = [], ticks = [];
+  var routeMain, routeJoin, markers = [], ticks = [], storyMarks = [];
   var lens = { main: 0, join: 0 };
+
+  /* 故事卡片元素 */
+  var rstEl = document.getElementById('routeStory');
+  var rstTitle = document.getElementById('rstTitle');
+  var rstBody = document.getElementById('rstBody');
+  var rstIdx = document.getElementById('rstIdx');
+  var storyActive = -1;
 
   /* 行军数据面板元素 */
   var rdMile = document.getElementById('rdMile'),
@@ -354,6 +396,66 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     });
 
     setActive(0);
+  }
+
+  /* ---------- 路线上的故事标记 ---------- */
+  function buildStories() {
+    if (!mapSvg || !routeMain || !lens.main) return;
+    storyMarks.forEach(function (m) {
+      if (m.g.parentNode) m.g.parentNode.removeChild(m.g);
+    });
+    storyMarks = [];
+
+    STORIES.forEach(function (s) {
+      var pt = routeMain.getPointAtLength(lens.main * Math.min(1, s.at));
+      var g = svgEl('g', { class: 'st' });
+      g.setAttribute('role', 'button');
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('aria-label', '长征故事：' + s.title);
+      var star = svgEl('path', {
+        d: starPath(pt.x, pt.y, 6),
+        fill: 'var(--gold)', stroke: 'var(--red-deep)', 'stroke-width': 1
+      });
+      g.appendChild(star);
+      g.appendChild(svgEl('circle', { cx: pt.x, cy: pt.y, r: 12, fill: 'transparent' }));
+      g.addEventListener('click', function () { scrollToProgress(s.at); });
+      g.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault(); scrollToProgress(s.at);
+        }
+      });
+      mapSvg.appendChild(g);
+      storyMarks.push({ g: g, star: star });
+    });
+  }
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  /* 到达故事位置：自动展开卡片；离开则收起 */
+  function updateStory(p) {
+    if (!rstEl) return;
+    var shown = -1;
+    for (var i = 0; i < STORIES.length; i++) {
+      if (p >= STORIES[i].at - 0.02 && p <= STORIES[i].at + STORIES[i].span) {
+        shown = i; break;
+      }
+    }
+    storyMarks.forEach(function (m, k) {
+      m.star.classList.toggle('lit', k === shown);
+    });
+    if (shown === storyActive) return;
+    storyActive = shown;
+    if (shown === -1) {
+      rstEl.classList.remove('show');
+      return;
+    }
+    var s = STORIES[shown];
+    rstTitle.textContent = s.title;
+    rstBody.textContent = s.body;
+    rstIdx.textContent = pad2(shown + 1) + ' / ' + pad2(STORIES.length);
+    rstEl.classList.remove('show');
+    void rstEl.offsetWidth;
+    rstEl.classList.add('show');
   }
 
   /* ---------- 行军数据面板：数字平滑 + 兵力变化图 ---------- */
@@ -544,15 +646,13 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     updatePanel(i);
   }
 
-  /* 点击点位 / 刻度：时间线平滑跳转至该节点 */
-  function jumpTo(i) {
+  /* 平滑滚动到路线的某个进度（0—1）；点位/刻度/故事标记共用 */
+  function scrollToProgress(p) {
     takeOver();
-    setActive(i);
     if (!routeScroll) return;
     var total = routeScroll.offsetHeight - window.innerHeight;
-    if (total <= 0) return;
     var top = routeScroll.getBoundingClientRect().top + window.pageYOffset;
-    var target = top + total * (i / (WAY.length - 1)) + 2;
+    var target = total > 0 ? top + total * p + 2 : top;
     var max = document.documentElement.scrollHeight - window.innerHeight;
     target = Math.max(0, Math.min(max, target));
     try {
@@ -560,6 +660,12 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     } catch (e) {
       window.scrollTo(0, target);
     }
+  }
+
+  /* 点击点位 / 刻度：时间线平滑跳转至该节点 */
+  function jumpTo(i) {
+    setActive(i);
+    scrollToProgress(i / (WAY.length - 1));
   }
 
   function positionCallout(i) {
@@ -628,12 +734,14 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     act = Math.max(0, Math.min(N - 1, act));
     setActive(act);
     positionCallout(act);
+    updateStory(p);
   }
 
   if (mapSvg) {
     try {
       buildTroop();
       buildRoute();
+      buildStories();
       updateRoute();
     } catch (err) { /* 路线图异常不影响全站 */ }
   }

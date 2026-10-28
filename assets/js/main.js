@@ -456,6 +456,25 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     rstEl.classList.remove('show');
     void rstEl.offsetWidth;
     rstEl.classList.add('show');
+    placeStory();
+  }
+
+  /* 故事卡与节点介绍卡分置画布两侧，避免互相遮挡 */
+  function placeStory() {
+    if (!rstEl || !canvas || !callout) return;
+    if (window.innerWidth < 720) {
+      rstEl.style.left = ''; rstEl.style.top = ''; rstEl.style.width = '';
+      return;
+    }
+    var cw = canvas.clientWidth;
+    if (!cw) return;
+    var calloutRight = (callout.offsetLeft + callout.offsetWidth / 2) > cw / 2;
+    var w = Math.min(430, Math.floor(cw * 0.44), cw - 364);
+    w = Math.max(w, 170);
+    var centerX = calloutRight ? (12 + w / 2) : (cw - 12 - w / 2);
+    rstEl.style.width = w + 'px';
+    rstEl.style.left = centerX + 'px';
+    rstEl.style.top = '50%';
   }
 
   /* ---------- 行军数据面板：数字平滑 + 兵力变化图 ---------- */
@@ -735,6 +754,7 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     setActive(act);
     positionCallout(act);
     updateStory(p);
+    placeStory();
   }
 
   if (mapSvg) {
@@ -746,63 +766,31 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     } catch (err) { /* 路线图异常不影响全站 */ }
   }
 
-  /* ---------- 跨时空对话：自动轮播 ---------- */
-  var ECHO = [
-    { q: '何为信仰？',
-      old: '哪怕只剩一个人，也要把红旗插到目的地——因为他们相信，这条路的尽头是中国的光明。',
-      now: '把一篇论文改到极致、把一个实验重复百次，是我对“把不可能变成可能”最朴素的注解。' },
-    { q: '何为坚持？',
-      old: '雪山草地之间，没有路就踩出路来；草根皮带咽下去，脚步依然向前。',
-      now: '实验室的深夜、图书馆的清晨，把“再试一次”变成肌肉记忆，就是我的爬雪山、过草地。' },
-    { q: '何为青年？',
-      old: '这支队伍里，许多人不过二十岁上下，却扛起了一个民族的走向。',
-      now: '青年的选择，就是时代的答案。走好脚下的每一步，便是最好的纪念。' },
-    { q: '何为人民？',
-      old: '于都河畔的门板、老乡递上的半袋青稞，军民之间是生死相依、患难与共。',
-      now: '从乡村振兴到社区志愿，把个人的成长写进更多人的生活里，让“为人民服务”落在实处。' }
-  ];
-  var tabs = Array.prototype.slice.call(document.querySelectorAll('.echo-tab'));
-  var echoOld = document.getElementById('echoOld');
-  var echoNow = document.getElementById('echoNow');
-  var echoIndex = -1, autoTimer = null, echoStarted = false;
+  /* ---------- 跨时空对话：信封展开 + 中轴绘制 ---------- */
+  var dlg = document.getElementById('dlg');
 
-  function playEcho(i) {
-    if (i === echoIndex) return;
-    echoIndex = i;
-    tabs.forEach(function (t, j) {
-      t.classList.toggle('on', j === i);
-      t.setAttribute('aria-selected', j === i ? 'true' : 'false');
-    });
-    echoOld.classList.remove('play');
-    echoNow.classList.remove('play');
-    void echoOld.offsetWidth;
-    echoOld.textContent = ECHO[i].old;
-    echoNow.textContent = ECHO[i].now;
-    echoOld.classList.add('play');
-    echoNow.classList.add('play');
-  }
-  function startEcho() {
-    if (echoStarted) return;
-    echoStarted = true;
-    playEcho(0);
-    if (!reduce) {
-      autoTimer = setInterval(function () {
-        playEcho((echoIndex + 1) % ECHO.length);
-      }, 6500);
-    }
-  }
-  tabs.forEach(function (t, i) {
-    t.addEventListener('click', function () {
-      playEcho(i);
-      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  /* 信封点击：展开 / 收起信纸 */
+  document.querySelectorAll('.letter-fold').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var letter = btn.closest('.letter');
+      if (!letter) return;
+      var open = letter.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   });
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting) startEcho();
-    }, { threshold: 0.25 }).observe(document.querySelector('.echo-stage'));
-  } else {
-    startEcho();
+
+  /* 中轴时间线：进入视口后由上而下绘出 */
+  if (dlg) {
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries, obs) {
+        if (entries[0].isIntersecting) {
+          dlg.classList.add('drawn');
+          obs.disconnect();
+        }
+      }, { threshold: 0.12 }).observe(dlg);
+    } else {
+      dlg.classList.add('drawn');
+    }
   }
 
   /* ---------- 顶部进度条 + 统一滚动调度 ---------- */
@@ -822,5 +810,5 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('load', function () { buildTour(); updateRoute(); });
-  window.addEventListener('resize', function () { buildTour(); updateRoute(); positionCallout(Math.max(0, active)); });
+  window.addEventListener('resize', function () { buildTour(); updateRoute(); positionCallout(Math.max(0, active)); placeStory(); });
 })();

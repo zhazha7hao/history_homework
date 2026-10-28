@@ -237,10 +237,6 @@
       </div>
     </div>
   </div>
-
-  <div class="wrap">
-    <p class="map-footnote">点位依据各重大事件发生地的真实经纬度排布，连线为示意路线，省略部分迂回与分支路线；各节点配图为历史场景想象图（艺术创作，非真实影像），京华红迹部分为场馆实景照片；历史影像与文物请通过官方数字展厅查阅；仅用于历史教育展示。</p>
-  </div>
 </section>
 
 <!-- ================= 京华红迹（官方入口直达） ================= -->
@@ -437,26 +433,112 @@
       <p class="sec-desc reveal">他们用草鞋与脚步丈量山河，我们用键盘、画笔、仪器与数据丈量梦想。变的是装备与战场，不变的是出发时的决心。</p>
     </div>
 
-    <div class="echo-tabs reveal" role="tablist" aria-label="跨时空叩问">
-      <button class="echo-tab on" type="button" role="tab" aria-selected="true">何为信仰？</button>
-      <button class="echo-tab" type="button" role="tab" aria-selected="false">何为坚持？</button>
-      <button class="echo-tab" type="button" role="tab" aria-selected="false">何为青年？</button>
-      <button class="echo-tab" type="button" role="tab" aria-selected="false">何为人民？</button>
-    </div>
-
-    <div class="echo-stage reveal">
-      <div class="echo-card old">
-        <div class="who">1936 · 他们说</div>
-        <p id="echoOld"></p>
+    <div class="dlg" id="dlg">
+      <!-- 中轴时间线：1934 → 1936 → 2026 -->
+      <div class="dlg-axis" aria-hidden="true">
+        <span class="dlg-axis-line" id="dlgAxisLine"></span>
       </div>
-      <div class="echo-badge" aria-hidden="true"><b>90</b><i>YEARS</i></div>
-      <div class="echo-card now">
-        <div class="who">2026 · 我们答</div>
-        <p id="echoNow"></p>
+
+      <!-- 一 · 一封跨越九十年的信 -->
+      <p class="dlg-step">一 · 一封跨越九十年的信</p>
+      <div class="letters">
+        <span class="dlg-axis-pt" aria-hidden="true" style="--y:24%"><b>1934</b><em>长征出发</em></span>
+        <span class="dlg-axis-pt" aria-hidden="true" style="--y:74%"><b>1935</b><em>狱中写《可爱的中国》</em></span>
+        <article class="letter old">
+          <button class="letter-fold" type="button" aria-expanded="false">
+            <span class="lf-stamp" aria-hidden="true">★</span>
+            <span class="lf-to">致 九十年后的<br>中国青年</span>
+            <span class="lf-postmark" aria-hidden="true">1935 · 南昌</span>
+            <span class="lf-open">点击展信 ▾</span>
+          </button>
+          <div class="letter-paper">
+            <div class="lp-inner">
+              <p class="lp-salute">亲爱的朋友们：</p>
+              <blockquote class="lp-quote">
+                朋友，我相信，到那时，到处都是活跃跃的创造，到处都是日新月异的进步，欢歌将代替了悲叹，笑脸将代替了哭脸，富裕将代替了贫穷，康健将代替了疾苦，智慧将代替了愚昧……明媚的花园，将代替了凄凉的荒地！
+              </blockquote>
+              <p class="lp-sign">——方志敏，1935 年 5 月于狱中<br>《可爱的中国》</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="letter now">
+          <button class="letter-fold" type="button" aria-expanded="false">
+            <span class="lf-to">回 方志敏先生<br>与那一代青年</span>
+            <span class="lf-open">点击展信 ▾</span>
+          </button>
+          <div class="letter-paper">
+            <div class="lp-inner">
+              <p class="lp-salute">今日中国，如你所愿——</p>
+              <ul class="lp-achieve">
+                <li><b>高铁</b>：5 万公里高铁飞驰，超过世界其他国家总和，千里江陵一日还。</li>
+                <li><b>航天</b>：“天宫”常驻太空，嫦娥取月背之土，中国人的脚步正迈向月球。</li>
+                <li><b>脱贫</b>：近 1 亿人告别绝对贫困，再没有人挨饿受冻。</li>
+              </ul>
+              <p class="lp-mid">也仍有未竟之处——关键核心技术还要攻关，城乡之间仍需弥合，发展不平衡不充分尚待解决。这，正是我们继续出发的理由。</p>
+              <p class="lp-sign">2026 年 · 北京，当代青年</p>
+              <span class="lp-stamp2" aria-hidden="true">2026<br>北京</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- 二 · 三组同题问答 -->
+      <p class="dlg-step">二 · 三组同题问答</p>
+      <div class="qa">
+        <span class="dlg-axis-pt" aria-hidden="true" style="--y:50%"><b>1936</b><em>三大主力会师</em></span>
+        <div class="qa-row">
+          <div class="qa-side them">
+            <span class="qa-who">1935 · 他们答</span>
+            <p>怕。可我们更怕的，是亡国灭种、山河破碎，是子孙后代做牛做马、抬不起头。</p>
+          </div>
+          <span class="qa-node" aria-hidden="true"></span>
+          <div class="qa-side us">
+            <span class="qa-who">2026 · 我们问</span>
+            <p>你们怕吗？</p>
+          </div>
+        </div>
+        <div class="qa-row">
+          <div class="qa-side them">
+            <span class="qa-who">1935 · 他们答</span>
+            <p>靠胸中的主义与信仰——坚信正义的事业必然胜利，革命理想高于天。</p>
+          </div>
+          <span class="qa-node" aria-hidden="true"></span>
+          <div class="qa-side us">
+            <span class="qa-who">2026 · 我们问</span>
+            <p>靠什么走完二万五千里？</p>
+          </div>
+        </div>
+        <div class="qa-row">
+          <div class="qa-side them">
+            <span class="qa-who">1935 · 他们问</span>
+            <p>那么，你们的“雪山草地”，是什么？</p>
+          </div>
+          <span class="qa-node" aria-hidden="true"></span>
+          <div class="qa-side us">
+            <span class="qa-who">2026 · 我们答</span>
+            <p>是实验室里重复的第一百次失败，是代码里改到凌晨的那个 bug，是论文写不下去、却仍咬牙再写一行的深夜。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 三 · 我们这一代的长征路 -->
+      <p class="dlg-step">三 · 我们这一代的长征路</p>
+      <div class="dlg-coda">
+        <span class="dlg-axis-pt" aria-hidden="true" style="--y:50%"><b>2026</b><em>今日中国</em></span>
+        <p class="coda-line">九十年前，他们的长征路写在大地上；<br>今天，我们的长征路写在日程表上。</p>
+        <div class="coda-actions">
+          <div class="ca-card"><b>科技攻关</b><span>把一道难题啃到底，让关键技术不再受制于人。</span></div>
+          <div class="ca-card"><b>基层服务</b><span>走进社区与乡村，做一件真正帮到人的小事。</span></div>
+          <div class="ca-card"><b>专业报国</b><span>把专业学深学精，让本领配得上这个时代。</span></div>
+        </div>
+        <blockquote class="coda-quote">
+          每一代人有每一代人的长征路，每一代人都要走好自己的长征路。
+          <cite>——2016 年 10 月 21 日，纪念红军长征胜利 80 周年大会</cite>
+        </blockquote>
+        <p class="coda-end">以青春之行，走好新时代的长征路。</p>
       </div>
     </div>
-
-    <p class="echo-hint">对话将自动轮播，亦可点选上方叩问</p>
   </div>
 </section>
 

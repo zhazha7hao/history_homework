@@ -518,9 +518,10 @@ body::before{
   content:"";flex:1;height:1px;
   background:linear-gradient(90deg,rgba(180,36,27,.4),transparent);
 }
-.relics .relic-grid{display:grid;gap:11px;}
+.relics .relic-grid{display:grid;grid-template-columns:1fr;gap:11px;}
 .relics .relic{
-  margin:0;display:grid;grid-template-columns:92px 1fr;gap:11px;align-items:start;
+  margin:0;display:grid;grid-template-columns:92px minmax(0,1fr);gap:11px;align-items:start;
+  min-width:0;
   padding-bottom:11px;border-bottom:1px dashed rgba(33,25,18,.14);
 }
 .relics .relic:last-child{padding-bottom:0;border-bottom:none;}
@@ -530,7 +531,7 @@ body::before{
   transition:box-shadow .3s ease,transform .3s ease;
 }
 .relics .relic img:hover{box-shadow:0 4px 14px rgba(180,36,27,.25);transform:translateY(-2px);}
-.relics .relic figcaption{font-size:12.5px;line-height:1.72;color:var(--ink-soft);}
+.relics .relic figcaption{min-width:0;overflow-wrap:anywhere;font-size:12.5px;line-height:1.72;color:var(--ink-soft);}
 .relics .relic figcaption strong{
   display:block;margin-bottom:2px;font-family:var(--display);font-weight:400;
   font-size:14px;letter-spacing:.05em;color:var(--ink);

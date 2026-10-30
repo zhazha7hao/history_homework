@@ -484,22 +484,20 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     placeStory();
   }
 
-  /* 故事卡与节点介绍卡分置画布两侧，避免互相遮挡 */
+  /* 故事卡同样使用避让选址（与节点浮窗互斥，同一时间仅一个活动浮窗） */
   function placeStory() {
-    if (!rstEl || !canvas || !callout) return;
+    if (!rstEl || !canvas) return;
     if (window.innerWidth < 720) {
       rstEl.style.left = ''; rstEl.style.top = ''; rstEl.style.width = '';
       return;
     }
-    var cw = canvas.clientWidth;
-    if (!cw) return;
-    var calloutRight = (callout.offsetLeft + callout.offsetWidth / 2) > cw / 2;
-    var w = Math.min(430, Math.floor(cw * 0.44), cw - 364);
-    w = Math.max(w, 170);
-    var centerX = calloutRight ? (12 + w / 2) : (cw - 12 - w / 2);
+    if (!avoidPts.length) computeAvoid();
+    var w = Math.min(430, Math.floor(canvas.clientWidth * 0.5));
     rstEl.style.width = w + 'px';
-    rstEl.style.left = centerX + 'px';
-    rstEl.style.top = '50%';
+    var h = rstEl.offsetHeight || 220;
+    var sp = bestSpot(w, h);
+    rstEl.style.left = (sp.left + sp.w / 2) + 'px';
+    rstEl.style.top = (sp.top + sp.h / 2) + 'px';
   }
 
   /* ---------- 行军数据面板：数字平滑 + 兵力变化图 ---------- */
@@ -712,38 +710,78 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     scrollToProgress(i / (WAY.length - 1));
   }
 
-  function positionCallout(i) {
-    if (!mapSvg || !canvas) return;
-    var w = WAY[i], p = proj(w.lon, w.lat);
+  /* ---------- 浮窗避让：采样路线线与关键节点，供浮窗选址 ---------- */
+  var avoidPts = [];  /* 路线线采样点（画布像素坐标） */
+  var avoidMks = [];  /* 关键节点坐标（画布像素坐标） */
+  function computeAvoid() {
+    avoidPts = []; avoidMks = [];
+    if (!mapSvg || !canvas || !routeMain || !lens.main) return;
     var svgRect = mapSvg.getBoundingClientRect();
     var cvRect = canvas.getBoundingClientRect();
     if (!svgRect.width || !cvRect.width) return;
+    var scale = Math.min(svgRect.width / VBW, svgRect.height / VBH);
+    var offX = (svgRect.width - VBW * scale) / 2;
+    var offY = (svgRect.height - VBH * scale) / 2;
+    var bx = (svgRect.left - cvRect.left) + offX;
+    var by = (svgRect.top - cvRect.top) + offY;
+    function toCv(x, y) { return [bx + (x - VBX) * scale, by + (y - VBY) * scale]; }
+    var L, q;
+    for (L = 0; L <= lens.main; L += 6) {
+      q = routeMain.getPointAtLength(L);
+      avoidPts.push(toCv(q.x, q.y));
+    }
+    if (routeJoin && lens.join) {
+      for (L = 0; L <= lens.join; L += 6) {
+        q = routeJoin.getPointAtLength(L);
+        avoidPts.push(toCv(q.x, q.y));
+      }
+    }
+    WAY.forEach(function (w) {
+      var p = proj(w.lon, w.lat);
+      avoidMks.push(toCv(p[0], p[1]));
+    });
+  }
 
+  /* 在 8 个候选位（四角 + 四边中）中，挑选与路线线/关键节点重叠最少的一处 */
+  function bestSpot(w, h) {
+    var cw = canvas.clientWidth, ch = canvas.clientHeight, m = 12;
+    w = Math.min(w, cw - m * 2); h = Math.min(h, ch - m * 2);
+    if (w <= 0 || h <= 0) return { left: m, top: m, w: Math.max(w, 1), h: Math.max(h, 1) };
+    var cands = [
+      [cw - w - m, m], [m, m],
+      [cw - w - m, ch - h - m], [m, ch - h - m],
+      [Math.round((cw - w) / 2), m], [Math.round((cw - w) / 2), ch - h - m],
+      [m, Math.round((ch - h) / 2)], [cw - w - m, Math.round((ch - h) / 2)]
+    ];
+    var pad = 16, best = cands[0], bp = Infinity, c, i, s;
+    for (c = 0; c < cands.length; c++) {
+      var rx = cands[c][0], ry = cands[c][1];
+      s = 0;
+      for (i = 0; i < avoidPts.length; i++) {
+        var a = avoidPts[i];
+        if (a[0] > rx - pad && a[0] < rx + w + pad && a[1] > ry - pad && a[1] < ry + h + pad) s++;
+      }
+      for (i = 0; i < avoidMks.length; i++) {
+        var b = avoidMks[i];
+        if (b[0] > rx - pad && b[0] < rx + w + pad && b[1] > ry - pad && b[1] < ry + h + pad) s += 40;
+      }
+      if (s < bp) { bp = s; best = cands[c]; }
+    }
+    return { left: best[0], top: best[1], w: w, h: h };
+  }
+
+  function positionCallout(i) {
+    if (!mapSvg || !canvas) return;
     if (window.innerWidth < 720) {
       callout.style.left=''; callout.style.top='';
       callout.style.right=''; callout.style.bottom='';
       return;
     }
-
-    var scale = Math.min(svgRect.width / VBW, svgRect.height / VBH);
-    var offX = (svgRect.width - VBW * scale) / 2;
-    var offY = (svgRect.height - VBH * scale) / 2;
-    var x = (svgRect.left - cvRect.left) + offX + (p[0] - VBX) * scale;
-    var y = (svgRect.top - cvRect.top) + offY + (p[1] - VBY) * scale;
-
+    if (!avoidPts.length) computeAvoid();
     var cw = callout.offsetWidth || 330, ch = callout.offsetHeight || 190;
-    var left, top;
-    if (x > cvRect.width * 0.52) {
-      left = x - cw - 22;
-      if (left < 10) left = x + 22;
-    } else {
-      left = x + 22;
-      if (left + cw > cvRect.width - 10) left = x - cw - 22;
-    }
-    top = y - ch / 2;
-    top = Math.max(10, Math.min(cvRect.height - ch - 10, top));
-    callout.style.left = left + 'px';
-    callout.style.top = top + 'px';
+    var sp = bestSpot(cw, ch);
+    callout.style.left = sp.left + 'px';
+    callout.style.top = sp.top + 'px';
   }
 
   function updateRoute() {
@@ -774,12 +812,13 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
       t.classList.toggle('on', p >= i / (N - 1) - 0.03);
     });
 
-    var act = Math.round(p * (N - 1));
+    /* 严格匹配阶段到达：进度抵达节点 i 的位置后才切换其浮窗（不再提前半段触发） */
+    var act = Math.floor(p * (N - 1) + 1e-4);
     act = Math.max(0, Math.min(N - 1, act));
     setActive(act);
-    positionCallout(act);
     updateStory(p);
-    placeStory();
+    /* 同一时间仅保留一个活动浮窗：故事卡在场时隐藏节点介绍卡 */
+    callout.classList.toggle('muted', storyActive !== -1);
   }
 
   if (mapSvg) {
@@ -788,7 +827,10 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
       buildTroop();
       buildRoute();
       buildStories();
+      computeAvoid();
       updateRoute();
+      positionCallout(Math.max(0, active));
+      placeStory();
     } catch (err) { /* 路线图异常不影响全站 */ }
   }
 
@@ -835,6 +877,44 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     });
   }
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('load', function () { buildTour(); updateRoute(); });
-  window.addEventListener('resize', function () { buildTour(); updateRoute(); positionCallout(Math.max(0, active)); placeStory(); });
+  window.addEventListener('load', function () {
+    buildTour(); computeAvoid(); updateRoute();
+    positionCallout(Math.max(0, active)); placeStory();
+  });
+  window.addEventListener('resize', function () {
+    buildTour(); computeAvoid(); updateRoute();
+    positionCallout(Math.max(0, active)); placeStory();
+  });
+
+  /* ---------- 今昔对比：滑杆拖动（Pointer Events 统一鼠标/触摸） ---------- */
+  function initCompare() {
+    var list = document.querySelectorAll('[data-compare]');
+    if (!list.length) return;
+    list.forEach(function (box) {
+      var frame = box.querySelector('.cmp-frame');
+      var handle = box.querySelector('.cmp-handle');
+      var dragging = false;
+      frame.style.touchAction = 'none';
+
+      function setPos(clientX) {
+        var r = frame.getBoundingClientRect();
+        var ratio = (clientX - r.left) / r.width;
+        ratio = Math.max(0, Math.min(1, ratio));
+        box.style.setProperty('--pos', (ratio * 100).toFixed(1) + '%');
+      }
+      function down(e) {
+        dragging = true;
+        setPos(e.clientX);
+        e.preventDefault();
+      }
+      handle.addEventListener('pointerdown', down);
+      frame.addEventListener('pointerdown', down);
+      window.addEventListener('pointermove', function (e) {
+        if (dragging) setPos(e.clientX);
+      });
+      window.addEventListener('pointerup', function () { dragging = false; });
+      window.addEventListener('pointercancel', function () { dragging = false; });
+    });
+  }
+  initCompare();
 })();

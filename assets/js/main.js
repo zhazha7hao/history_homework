@@ -245,7 +245,7 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
 
   /* 仅作相对定位使用：真实经纬度 → 画布坐标 */
   var NS = 'http://www.w3.org/2000/svg';
-  var VBX = 252, VBY = 146, VBW = 218, VBH = 190;
+  var VBX = 7, VBY = 6, VBW = 631, VBH = 517;
   function proj(lon, lat) { return [(lon - 72) * 10, (55 - lat) * 10]; }
   function svgEl(name, attrs) {
     var e = document.createElementNS(NS, name);
@@ -305,7 +305,6 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
   var rstEl = document.getElementById('routeStory');
   var rstTitle = document.getElementById('rstTitle');
   var rstBody = document.getElementById('rstBody');
-  var rstIdx = document.getElementById('rstIdx');
   var storyActive = -1;
 
   /* 行军数据面板元素 */
@@ -320,6 +319,35 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
       rdTroopM = document.getElementById('rdTroopM'),
       troopSvg = document.getElementById('troopSvg');
   var troopCurDot = null, troopClipRect = null, tweenRaf = {};
+
+  /* ---------- 真实中国地图背景（GeoJSON → 同投影 SVG） ---------- */
+  function ringToPath(ring) {
+    return ring.map(function (pt, i) {
+      var p = proj(pt[0], pt[1]);
+      return (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ' ' + p[1].toFixed(1);
+    }).join('') + 'Z';
+  }
+  function geoToPath(feat) {
+    var d = '';
+    if (feat.type === 'Polygon') {
+      feat.coords.forEach(function (ring) { d += ringToPath(ring); });
+    } else {
+      feat.coords.forEach(function (poly) {
+        poly.forEach(function (ring) { d += ringToPath(ring); });
+      });
+    }
+    return d;
+  }
+  function buildChinaMap() {
+    if (!mapSvg || !window.CHINA_GEO) return;
+    var g = svgEl('g', { class: 'china-map' });
+    window.CHINA_GEO.features.forEach(function (f) {
+      var path = svgEl('path', { d: geoToPath(f), 'data-name': f.name });
+      path.setAttribute('class', f.jd ? 'china-jd' : 'china-prov');
+      g.appendChild(path);
+    });
+    mapSvg.insertBefore(g, mapSvg.firstChild);
+  }
 
   function buildRoute() {
     if (!mapSvg) return;
@@ -359,8 +387,8 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
       var halo = svgEl('circle', { cx: p[0], cy: p[1], r: 10, fill: 'var(--red)', opacity: 0 });
       g.appendChild(halo);
       var c = svgEl('circle', {
-        cx: p[0], cy: p[1], r: 5.4, fill: 'rgba(243,234,218,.4)',
-        stroke: 'rgba(199,154,59,.5)', 'stroke-width': 1.4
+        cx: p[0], cy: p[1], r: 4.6, fill: 'rgba(243,234,218,.45)',
+        stroke: 'rgba(199,154,59,.55)', 'stroke-width': 1.2
       });
       g.appendChild(c);
 
@@ -429,8 +457,6 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     });
   }
 
-  function pad2(n) { return (n < 10 ? '0' : '') + n; }
-
   /* 到达故事位置：自动展开卡片；离开则收起 */
   function updateStory(p) {
     if (!rstEl) return;
@@ -452,7 +478,6 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
     var s = STORIES[shown];
     rstTitle.textContent = s.title;
     rstBody.textContent = s.body;
-    rstIdx.textContent = pad2(shown + 1) + ' / ' + pad2(STORIES.length);
     rstEl.classList.remove('show');
     void rstEl.offsetWidth;
     rstEl.classList.add('show');
@@ -759,6 +784,7 @@ var WAY_IMGS = ['assets/img/way-01.jpg', 'assets/img/way-02.jpg', 'assets/img/wa
 
   if (mapSvg) {
     try {
+      buildChinaMap();
       buildTroop();
       buildRoute();
       buildStories();

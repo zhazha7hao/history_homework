@@ -234,6 +234,22 @@ body::before{
 .mk{cursor:pointer;}
 .mk-label{font-family:var(--display);letter-spacing:.4px;}
 
+/* 真实中国地图背景（与路线点同投影，自动对齐） */
+.china-map{pointer-events:none;}
+.china-prov{
+  fill:rgba(243,234,218,.055);
+  stroke:rgba(199,154,59,.4);
+  stroke-width:.75;
+  stroke-linejoin:round;
+}
+.china-jd{
+  fill:none;
+  stroke:rgba(199,154,59,.6);
+  stroke-width:1;
+  stroke-dasharray:3.2 3.2;
+  stroke-linecap:round;
+}
+
 .route-callout{
   position:absolute;left:0;top:0;z-index:5;width:min(330px,80vw);
   max-height:min(58vh,430px);overflow-y:auto;
@@ -291,12 +307,9 @@ body::before{
   font-family:var(--display);font-size:11px;letter-spacing:.24em;color:var(--gold);}
 .rst-badge i{width:9px;height:9px;background:var(--gold);
   clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);}
-.rst-idx{font-family:var(--display);font-size:10.5px;letter-spacing:.14em;color:rgba(243,234,218,.5);}
 .rst-title{margin-top:9px;font-family:var(--display);font-weight:400;
   font-size:clamp(16px,3.6vw,19px);letter-spacing:.05em;color:#F6EBD8;}
 .rst-body{margin-top:9px;font-size:12.5px;line-height:1.9;color:rgba(243,234,218,.82);}
-.rst-foot{margin-top:12px;padding-top:9px;border-top:1px dashed rgba(199,154,59,.3);
-  font-family:var(--display);font-size:10px;letter-spacing:.2em;color:rgba(199,154,59,.6);}
 
 /* 故事五角星标记：未到达时暗淡，到达时变亮并脉冲 */
 .st{cursor:pointer;}
@@ -666,7 +679,6 @@ body::before{
 @media (min-width:760px){.footer-meta{grid-template-columns:1fr 1fr 1fr;}}
 .footer-meta h5{font-family:var(--display);font-weight:400;font-size:12px;letter-spacing:.3em;color:var(--gold);}
 .footer-meta p{margin-top:10px;font-size:12.5px;line-height:2;color:rgba(243,234,218,.6);}
-.footer-note{margin-top:clamp(30px,5vw,44px);font-size:11.5px;letter-spacing:.08em;color:rgba(243,234,218,.42);line-height:2;}
 
 
 /* ================= 节点配图 / 场馆配图 / 灯箱 ================= */
